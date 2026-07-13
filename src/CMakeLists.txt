@@ -126,6 +126,7 @@ set(wiznote_SOURCES
     share/WebSocketClientWrapper.cpp
     share/WebSocketTransport.cpp
     share/WizWebEngineView.cpp
+    share/normalbrowserobject.cpp
     widgets/WizTableSelector.cpp
     widgets/WizUserServiceExprDialog.cpp
 
@@ -330,6 +331,7 @@ set(wiznote_HEADERS
     share/WebSocketClientWrapper.h
     share/WebSocketTransport.h
     share/WizWebEngineView.h
+    share/normalbrowserobject.h
     WizWebEngineInjectObject.h
     widgets/WizShareLinkDialog.h
     share/WizAnalyzer.h
