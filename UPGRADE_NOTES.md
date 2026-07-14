@@ -43,15 +43,48 @@ user-facing wins.
 |---|---|---|---|---|
 | OpenSSL | `lib/openssl` | 1.0.1e (2013) | 3.x | **Critical.** This is the exact version vulnerable to Heartbleed (CVE-2014-0160, fixed in 1.0.1g). Only linked on the **macOS** build path (`APPLE` branch of `src/CMakeLists.txt`, lines ~550-563); the Linux build does not link it (relies on Qt's SSL backend / system libssl instead). Should be replaced with system OpenSSL or removed entirely from the macOS link step. |
 | zlib | `lib/zlib` | 1.2.8 (2013) | 1.3.1 | Multiple known CVEs (e.g. buffer handling issues in `inflate`) patched in later releases. Only built on the **Windows** path per `lib/CMakeLists.txt`. |
-| Crypto++ | `lib/cryptopp` | 5.6.1 / 5.6.2 (~2013) | 8.9+ | Actively built and linked on **all platforms** as the `cryptlib` target — highest-impact upgrade target since every build uses it. A decade of algorithm/hardening updates missed. |
+| Crypto++ | `lib/cryptopp` | ~~5.6.1 / 5.6.2 (~2013)~~ **8.9.0 (2023, upgraded)** | 8.9+ | **Done.** Upgraded to the CRYPTOPP_8_9_0 tag. Compiled into every platform's build as the `cryptlib` target. See "Crypto++ upgrade notes" below for details. |
 | JsonCpp | `src/share/jsoncpp` | 1.8.0 (2017) | 1.9.6 | Vendored as a single amalgamated file. Moderately old, lower risk than the above. |
 | QuaZip | `lib/quazip` | Untagged vendored snapshot, pre-Qt6 API | Current upstream supports Qt5/Qt6 | No version marker present; API predates current upstream releases. Should be checked for Qt6 compatibility before any Qt6 migration. |
 
 **Priority order suggested:**
 1. Remove/replace bundled OpenSSL 1.0.1e (macOS build) — actively insecure.
-2. Upgrade Crypto++ — compiled into every platform's build.
+2. ~~Upgrade Crypto++ — compiled into every platform's build.~~ Done, see below.
 3. Upgrade zlib (Windows build) — known decompression CVEs.
 4. Upgrade JsonCpp and QuaZip — lower urgency, but blockers for a Qt6 port.
+
+### Crypto++ upgrade notes (completed)
+
+`lib/cryptopp` was upgraded in place from the vendored 5.6.1/5.6.2 snapshot to
+upstream tag `CRYPTOPP_8_9_0`, keeping the repo's own hand-written
+`lib/cryptopp/CMakeLists.txt` (upstream no longer ships a CMake build for the
+library itself). Notable follow-up work required:
+
+- Crypto++ 8.x splits `config.h` into several `config_*.h` headers; the
+  library version is now read from `config_ver.h` instead of `config.h`.
+- Crypto++ 8.x added several per-file SIMD source files (e.g.
+  `blake2s_simd.cpp`, `chacha_avx.cpp`, `rijndael_simd.cpp`) that must be
+  compiled with matching `-m<isa>` flags (`-mssse3`, `-msse4.1`, `-mavx2`,
+  `-mpclmul`, `-maes`, `-msha`, etc.), mirroring what upstream's `GNUmakefile`
+  does per-file. Without these flags GCC/Clang fail with "inlining failed ...
+  target specific option mismatch" errors. These flags are now applied via
+  `set_source_files_properties(... PROPERTIES COMPILE_OPTIONS ...)` in
+  `lib/cryptopp/CMakeLists.txt`, guarded to GCC/Clang on x86/x86_64.
+- The test/bench/validation source file names changed upstream (e.g.
+  `regtest.cpp` → `regtest1..4.cpp`, `validat1..3.cpp` → `validat0..10.cpp`,
+  `bench.cpp` → `bench1..3.cpp`). The `PROJECT_TEST` exclusion list in
+  `lib/cryptopp/CMakeLists.txt` was updated to match, so these files are
+  excluded from the `cryptlib` static library build as before.
+- `CryptoPP::StreamTransformation::ProcessLastBlock` gained an explicit
+  output-length parameter between 5.6.x and 8.x. `src/share/WizEnc.cpp`
+  (`WizAES::encrypt`/`decrypt`) was updated to pass the output length (16
+  bytes, matching the AES block size) explicitly.
+- Verified: `cryptlib` builds cleanly, the full `WizNote` binary links, and a
+  standalone AES-256-CBC/PKCS5 encrypt→decrypt round trip using the updated
+  `ProcessLastBlock` calls produces the original plaintext.
+- Not yet done: `src/src.pro` / `WizNote.pro` (legacy qmake build) were not
+  updated — only the CMake build was verified. RSA (`CryptoPP::RSAES_PKCS1v15_*`)
+  code paths compiled successfully but were not round-trip tested.
 
 On Linux specifically, the system-provided Qt5, OpenSSL, and other libraries
 pulled from apt are current; the vendored copies under `lib/` and

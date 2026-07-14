@@ -44,8 +44,11 @@ list (APPEND PROJECT_CPP ${CMAKE_CURRENT_BINARY_DIR}/adhoc.cpp)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 
-set (PROJECT_TEST bench bench2 test validat1 validat2 validat3 adhoc datatest
-  regtest fipsalgt fipstest)
+set (PROJECT_TEST bench1 bench2 bench3 test
+  validat0 validat1 validat2 validat3 validat4 validat5 validat6 validat7
+  validat8 validat9 validat10
+  regtest1 regtest2 regtest3 regtest4
+  adhoc datatest fipsalgt fipstest)
 
 if (WIN32)
   list (APPEND PROJECT_TEST dlltest)
@@ -82,6 +85,55 @@ if (CMAKE_CXX_COMPILER MATCHES ic[c|l])
   # Function was declared but never referenced
   add_definitions (-wd177)
 endif (CMAKE_CXX_COMPILER MATCHES ic[c|l])
+
+# Crypto++ 8.x ships per-file SIMD source files (e.g. blake2s_simd.cpp,
+# chacha_avx.cpp) that rely on the upstream GNUmakefile/CMake build compiling
+# each of them with a specific -m<isa> flag matching the intrinsics it uses
+# (see CRYPTOPP_SOURCE/GNUmakefile). Without the matching flag, GCC/Clang can
+# fail with "inlining failed ... target specific option mismatch" because the
+# intrinsics headers mark their functions always_inline for the enabled ISA
+# only. Reproduce that per-file flag assignment here for GCC/Clang on x86.
+if ((CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang") AND
+    (CMAKE_SYSTEM_PROCESSOR MATCHES "^(i.86|x86_64|AMD64)$"))
+  set (_CRYPTOPP_SSE2 -msse2)
+  set (_CRYPTOPP_SSSE3 -mssse3)
+  set (_CRYPTOPP_SSE41 -msse4.1)
+  set (_CRYPTOPP_SSE42 -msse4.2)
+  set (_CRYPTOPP_CLMUL -mpclmul)
+  set (_CRYPTOPP_AESNI -maes)
+  set (_CRYPTOPP_SHANI -msha)
+  set (_CRYPTOPP_AVX2 -mavx2)
+
+  macro (_cryptopp_set_simd_flags _file)
+    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_file})
+      set_source_files_properties (${CMAKE_CURRENT_SOURCE_DIR}/${_file}
+        PROPERTIES COMPILE_OPTIONS "${ARGN}")
+    endif (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_file})
+  endmacro (_cryptopp_set_simd_flags)
+
+  _cryptopp_set_simd_flags (blake2s_simd.cpp ${_CRYPTOPP_SSE41})
+  _cryptopp_set_simd_flags (blake2b_simd.cpp ${_CRYPTOPP_SSE41})
+  _cryptopp_set_simd_flags (chacha_simd.cpp ${_CRYPTOPP_SSE2})
+  _cryptopp_set_simd_flags (chacha_avx.cpp ${_CRYPTOPP_AVX2})
+  _cryptopp_set_simd_flags (cham_simd.cpp ${_CRYPTOPP_SSSE3})
+  _cryptopp_set_simd_flags (crc_simd.cpp ${_CRYPTOPP_SSE42})
+  _cryptopp_set_simd_flags (donna_sse.cpp ${_CRYPTOPP_SSE2})
+  _cryptopp_set_simd_flags (gcm_simd.cpp ${_CRYPTOPP_SSSE3} ${_CRYPTOPP_CLMUL})
+  _cryptopp_set_simd_flags (gf2n_simd.cpp ${_CRYPTOPP_CLMUL})
+  _cryptopp_set_simd_flags (keccak_simd.cpp ${_CRYPTOPP_SSSE3})
+  _cryptopp_set_simd_flags (lea_simd.cpp ${_CRYPTOPP_SSSE3})
+  _cryptopp_set_simd_flags (lsh256_sse.cpp ${_CRYPTOPP_SSSE3})
+  _cryptopp_set_simd_flags (lsh256_avx.cpp ${_CRYPTOPP_AVX2})
+  _cryptopp_set_simd_flags (lsh512_sse.cpp ${_CRYPTOPP_SSSE3})
+  _cryptopp_set_simd_flags (lsh512_avx.cpp ${_CRYPTOPP_AVX2})
+  _cryptopp_set_simd_flags (rijndael_simd.cpp ${_CRYPTOPP_SSE41} ${_CRYPTOPP_AESNI})
+  _cryptopp_set_simd_flags (sha_simd.cpp ${_CRYPTOPP_SSE42} ${_CRYPTOPP_SHANI})
+  _cryptopp_set_simd_flags (shacal2_simd.cpp ${_CRYPTOPP_SSE42} ${_CRYPTOPP_SHANI})
+  _cryptopp_set_simd_flags (simon128_simd.cpp ${_CRYPTOPP_SSSE3})
+  _cryptopp_set_simd_flags (speck128_simd.cpp ${_CRYPTOPP_SSSE3})
+  _cryptopp_set_simd_flags (sm4_simd.cpp ${_CRYPTOPP_SSSE3} ${_CRYPTOPP_AESNI})
+  _cryptopp_set_simd_flags (sse_simd.cpp ${_CRYPTOPP_SSE2})
+endif ()
 
 #remove_definitions (-DUNICODE -D_UNICODE)
 
@@ -256,7 +308,7 @@ if (TARGET crypttest)
     COMMENT "Copying cryptopp test data")
 endif (TARGET crypttest)
 
-set (_CRYPTOPP_VERSION_HEADER ${CMAKE_CURRENT_LIST_DIR}/config.h)
+set (_CRYPTOPP_VERSION_HEADER ${CMAKE_CURRENT_LIST_DIR}/config_ver.h)
 
 file (STRINGS ${_CRYPTOPP_VERSION_HEADER} _CRYPTOPP_VERSION_TMP REGEX
   "^#define CRYPTOPP_VERSION[ \t]+[0-9]+$")
