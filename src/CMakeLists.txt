@@ -349,7 +349,7 @@ set(wiznote_HEADERS
     widgets/WizLocalProgressWebView.h
     widgets/WizCrashReportDialog.h
     widgets/WizCustomToolBar.h
-    widgets/WizTipsWidget.cpp
+    widgets/WizTipsWidget.h
     widgets/WizSingleDocumentView.h
     widgets/WizTemplatePurchaseDialog.h
     widgets/WizExecutingActionDialog.h
