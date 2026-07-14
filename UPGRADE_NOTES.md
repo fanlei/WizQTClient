@@ -45,13 +45,13 @@ user-facing wins.
 | zlib | `lib/zlib` | 1.2.8 (2013) | 1.3.1 | Multiple known CVEs (e.g. buffer handling issues in `inflate`) patched in later releases. Only built on the **Windows** path per `lib/CMakeLists.txt`. |
 | Crypto++ | `lib/cryptopp` | ~~5.6.1 / 5.6.2 (~2013)~~ **8.9.0 (2023, upgraded)** | 8.9+ | **Done.** Upgraded to the CRYPTOPP_8_9_0 tag. Compiled into every platform's build as the `cryptlib` target. See "Crypto++ upgrade notes" below for details. |
 | JsonCpp | `src/share/jsoncpp` | ~~1.8.0 (2017)~~ **1.9.6 (upgraded)** | 1.9.6 | **Done.** Re-amalgamated from upstream tag `1.9.6` via `amalgamate.py`, replacing `jsoncpp.cpp`/`json/json.h`/`json/json-forwards.h` in place. |
-| QuaZip | `lib/quazip` | Untagged vendored snapshot, pre-Qt6 API | Current upstream supports Qt5/Qt6 | No version marker present; API predates current upstream releases. Should be checked for Qt6 compatibility before any Qt6 migration. |
+| QuaZip | `lib/quazip` | ~~Untagged vendored snapshot~~ **v1.4 (upgraded)** | Current upstream supports Qt5/Qt6 | **Done.** Upgraded to upstream tag `v1.4`. See "QuaZip upgrade notes" below. Still worth re-checking Qt6 compatibility once a Qt6 migration is attempted, since v1.4 supports both. |
 
 **Priority order suggested:**
 1. Remove/replace bundled OpenSSL 1.0.1e (macOS build) — actively insecure.
 2. ~~Upgrade Crypto++ — compiled into every platform's build.~~ Done, see below.
 3. Upgrade zlib (Windows build) — known decompression CVEs.
-4. ~~Upgrade JsonCpp~~ Done, see below. QuaZip remains — lower urgency, but a blocker for a Qt6 port.
+4. ~~Upgrade JsonCpp and QuaZip~~ Done, see below.
 
 ### JsonCpp upgrade notes (completed)
 
@@ -67,6 +67,41 @@ Verified: the full project builds cleanly with no new warnings/errors
 attributable to JsonCpp, and a standalone parse→serialize→re-parse round
 trip using `Json::Reader`/`Json::FastWriter` (the exact classes used by this
 codebase) succeeds against the new 1.9.6 sources.
+
+### QuaZip upgrade notes (completed)
+
+`lib/quazip` was upgraded in place from an untagged, undated vendored
+snapshot to upstream tag `v1.4`, keeping this repo's own minimal
+`lib/quazip/CMakeLists.txt` (glob-based static library, no `find_package`)
+rather than adopting upstream's newer namespaced-target CMake config, since
+this repo vendors the sources directly instead of installing/importing the
+library.
+
+Notes:
+- Per upstream's own `QuaZip-1.x-migration.md`, the 0.x → 1.x jump changed
+  only build/packaging conventions (CMake target names, install paths,
+  `QuaZip-QtX-Y` include prefixes) — the C++ class API itself
+  (`QuaZip`, `QuaZipFile`, `QuaZipFileInfo`, `QuaZipNewInfo`, `JlCompress`)
+  is source-compatible with 0.x, and the classic `#include
+  "quazip/quazip.h"` style include path (which this repo relies on via
+  `include_directories(${CMAKE_SOURCE_DIR}/lib)`) is still supported.
+- `crypt.h` was renamed to `minizip_crypt.h` upstream; internal `#include`
+  directives in `zip.c`/`unzip.c` already reference the new name, so no
+  local changes were needed.
+- `quachecksum32.cpp` is now a separate translation unit instead of
+  header-only, and a new `quazip_qt_compat.h` header was added — both are
+  picked up automatically by the existing `file(GLOB SRCS "*.c" "*.cpp")` in
+  `lib/quazip/CMakeLists.txt`.
+- `src/share/WizZip.cpp` defines its own local `class JlCompress` that
+  reimplements (rather than calls into) `lib/quazip/JlCompress.{h,cpp}`; the
+  QuaZip primitives it actually depends on (`QuaZip::getMode`,
+  `getZipError`, `getCurrentFileInfo`, `getFileInfoList`, `getFileNameList`,
+  `getZipName`, `goToFirstFile`, `goToNextFile`, `setCurrentFile`,
+  `open`/`close`) all have identical signatures in v1.4.
+- Verified: `quazip` static library and the full `WizNote` binary build
+  cleanly, and a standalone write→close→reopen→read round trip using the
+  `QuaZip`/`QuaZipFile`/`QuaZipNewInfo` classes directly reproduces the
+  original file content.
 
 ### Crypto++ upgrade notes (completed)
 
@@ -123,7 +158,7 @@ missed during the qmake→CMake migration.
       or a current vendored release.
 - [x] Upgrade Crypto++ to a current release across all platforms. (done: 8.9.0)
 - [ ] Upgrade zlib in the Windows build.
-- [x] Upgrade JsonCpp. (done: 1.9.6) / [ ] Upgrade QuaZip.
+- [x] Upgrade JsonCpp. (done: 1.9.6) / [x] Upgrade QuaZip. (done: v1.4)
 - [ ] Once vendored libs are current, scope a dedicated Qt6 migration:
       fix deprecated API usage, update `.pro` files, update
       `cmake/QtChooser.cmake`, and validate QtWebEngine-based editor/viewer
