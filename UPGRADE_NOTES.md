@@ -44,14 +44,29 @@ user-facing wins.
 | OpenSSL | `lib/openssl` | 1.0.1e (2013) | 3.x | **Critical.** This is the exact version vulnerable to Heartbleed (CVE-2014-0160, fixed in 1.0.1g). Only linked on the **macOS** build path (`APPLE` branch of `src/CMakeLists.txt`, lines ~550-563); the Linux build does not link it (relies on Qt's SSL backend / system libssl instead). Should be replaced with system OpenSSL or removed entirely from the macOS link step. |
 | zlib | `lib/zlib` | 1.2.8 (2013) | 1.3.1 | Multiple known CVEs (e.g. buffer handling issues in `inflate`) patched in later releases. Only built on the **Windows** path per `lib/CMakeLists.txt`. |
 | Crypto++ | `lib/cryptopp` | ~~5.6.1 / 5.6.2 (~2013)~~ **8.9.0 (2023, upgraded)** | 8.9+ | **Done.** Upgraded to the CRYPTOPP_8_9_0 tag. Compiled into every platform's build as the `cryptlib` target. See "Crypto++ upgrade notes" below for details. |
-| JsonCpp | `src/share/jsoncpp` | 1.8.0 (2017) | 1.9.6 | Vendored as a single amalgamated file. Moderately old, lower risk than the above. |
+| JsonCpp | `src/share/jsoncpp` | ~~1.8.0 (2017)~~ **1.9.6 (upgraded)** | 1.9.6 | **Done.** Re-amalgamated from upstream tag `1.9.6` via `amalgamate.py`, replacing `jsoncpp.cpp`/`json/json.h`/`json/json-forwards.h` in place. |
 | QuaZip | `lib/quazip` | Untagged vendored snapshot, pre-Qt6 API | Current upstream supports Qt5/Qt6 | No version marker present; API predates current upstream releases. Should be checked for Qt6 compatibility before any Qt6 migration. |
 
 **Priority order suggested:**
 1. Remove/replace bundled OpenSSL 1.0.1e (macOS build) — actively insecure.
 2. ~~Upgrade Crypto++ — compiled into every platform's build.~~ Done, see below.
 3. Upgrade zlib (Windows build) — known decompression CVEs.
-4. Upgrade JsonCpp and QuaZip — lower urgency, but blockers for a Qt6 port.
+4. ~~Upgrade JsonCpp~~ Done, see below. QuaZip remains — lower urgency, but a blocker for a Qt6 port.
+
+### JsonCpp upgrade notes (completed)
+
+`src/share/jsoncpp` was re-amalgamated from upstream tag `1.9.6` (previously
+1.8.0) using upstream's `amalgamate.py` script, which regenerates the single
+`jsoncpp.cpp` + `json/json.h` + `json/json-forwards.h` files this repo
+vendors (no CMake/build changes were needed; the source files were swapped
+in place). The APIs used throughout the codebase (`Json::Value`,
+`Json::Reader`, `Json::FastWriter`) are deprecated-but-still-present in
+1.9.6, so no call-site changes were required.
+
+Verified: the full project builds cleanly with no new warnings/errors
+attributable to JsonCpp, and a standalone parse→serialize→re-parse round
+trip using `Json::Reader`/`Json::FastWriter` (the exact classes used by this
+codebase) succeeds against the new 1.9.6 sources.
 
 ### Crypto++ upgrade notes (completed)
 
@@ -106,9 +121,9 @@ missed during the qmake→CMake migration.
       source files from the qmake→CMake migration.
 - [ ] Replace bundled OpenSSL 1.0.1e in the macOS build with system OpenSSL
       or a current vendored release.
-- [ ] Upgrade Crypto++ to a current release across all platforms.
+- [x] Upgrade Crypto++ to a current release across all platforms. (done: 8.9.0)
 - [ ] Upgrade zlib in the Windows build.
-- [ ] Upgrade JsonCpp and QuaZip.
+- [x] Upgrade JsonCpp. (done: 1.9.6) / [ ] Upgrade QuaZip.
 - [ ] Once vendored libs are current, scope a dedicated Qt6 migration:
       fix deprecated API usage, update `.pro` files, update
       `cmake/QtChooser.cmake`, and validate QtWebEngine-based editor/viewer
