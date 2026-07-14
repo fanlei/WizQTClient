@@ -1,9 +1,10 @@
-﻿#ifndef WIZDATABASE_H
+#ifndef WIZDATABASE_H
 #define WIZDATABASE_H
 
 #include <QPointer>
 #include <QMap>
 #include <QMutex>
+#include <QRecursiveMutex>
 
 #include "WizIndex.h"
 #include "WizThumbIndex.h"
@@ -118,7 +119,7 @@ private:
     QMap<QString, WizDatabase*> m_mapGroups;
 
 private:
-    QMutex m_mutexCache;
+    QRecursiveMutex m_mutexCache;
     CWizGroupDataArray m_cachedGroups;
     CWizBizDataArray m_cachedBizs;
 public:

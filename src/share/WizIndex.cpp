@@ -1,4 +1,4 @@
-﻿#include "WizIndex.h"
+#include "WizIndex.h"
 
 #include <QDebug>
 
@@ -1542,7 +1542,7 @@ bool WizIndex::getDocumentsByTag(const CString& strLocation,
 	CString strWhere;
     if (!strLocation.isEmpty()) {
         strWhere.format("DOCUMENT_LOCATION like %s and DOCUMENT_GUID in (select DOCUMENT_GUID from WIZ_DOCUMENT_TAG where TAG_GUID=%s)",
-                        STR2SQL(CString(strLocation) + '%').utf16(),
+                        STR2SQL(CString(strLocation) + "%").utf16(),
                         STR2SQL(data.strGUID).utf16()
                         );
     } else {
@@ -1599,7 +1599,7 @@ bool WizIndex::getDocumentsByStyle(const CString& strLocation, const WIZSTYLEDAT
 	CString strWhere;
     if (strLocation && *strLocation) {
         strWhere.format("DOCUMENT_LOCATION like %s and STYLE_GUID=%s",
-            STR2SQL(CString(strLocation) + '%').utf16(),
+            STR2SQL(CString(strLocation) + "%").utf16(),
             STR2SQL(data.strGUID).utf16()
 			);
     } else {

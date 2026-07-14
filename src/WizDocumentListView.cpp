@@ -1,4 +1,4 @@
-﻿#include "WizDocumentListView.h"
+#include "WizDocumentListView.h"
 
 #include <QPixmapCache>
 #include <QApplication>
@@ -1114,7 +1114,7 @@ bool mime2Notes(const QString& mime, WizDatabaseManager& dbMgr, CWizDocumentData
     if (mime.isEmpty())
         return false;
 
-    QStringList docIDList = mime.split(';', QString::SkipEmptyParts);
+    QStringList docIDList = mime.split(';', Qt::SkipEmptyParts);
     for (QString docID : docIDList)
     {
         QStringList docIDS = docID.split(':');
@@ -1150,7 +1150,7 @@ QPixmap CreateDocumentDragBadget(const CWizDocumentDataArray& arrayDocument)
     QFont font = pt.font();
     font.setPixelSize(12);
     QFontMetrics fm(font);
-    int textWidth = fm.width(QString::number(arrayDocument.size()));
+    int textWidth = fm.horizontalAdvance(QString::number(arrayDocument.size()));
     if (rcNumber.width() < (textWidth + 8))
     {
         rcNumber.setWidth(textWidth + 8);
@@ -1179,7 +1179,7 @@ QPixmap CreateDocumentDragBadget(const CWizDocumentDataArray& arrayDocument)
         //
         QRect rcTitle(rcIcon.right() + 4, rcItem.top(), rcItem.right() - rcIcon.right() - 4, rcItem.height());
         QString text = fm.elidedText(doc.strTitle, Qt::ElideMiddle, rcTitle.width() - 14);
-        rcTitle.setWidth(fm.width(text) + 14);
+        rcTitle.setWidth(fm.horizontalAdvance(text) + 14);
         int leftSpace = nImageWidth - rcIcon.width() - 4;
         rcTitle.setWidth(rcTitle.width() > leftSpace ? leftSpace : rcTitle.width());
         pt.setPen(QColor("#3177EE"));
@@ -1776,7 +1776,9 @@ void WizDocumentListView::on_action_deleteDocument()
     }
     else if (selectedItems().isEmpty())
     {
-        setItemSelected(documentItemAt(index), true);
+        if (QListWidgetItem* item = documentItemAt(index)) {
+            item->setSelected(true);
+        }
     }
     emit documentsSelectionChanged();
 }
@@ -2130,30 +2132,7 @@ const WIZDOCUMENTDATA& WizDocumentListView::documentFromIndex(const QModelIndex 
 
 void WizDocumentListView::wheelEvent(QWheelEvent* event)
 {
-    //if (event->orientation() == Qt::Vertical) {
-        //vscrollBeginUpdate(event->delta());
-        //return;
-    //}
-
-    int delta = event->delta();
-    switch (m_nViewType)
-    {
-    case TypeThumbnail:
-        //delta = delta / 3;
-        break;
-    case TypeTwoLine:
-        //delta = int(delta / 1.5);
-        break;
-    default:
-        break;
-    }
-    QWheelEvent* newEvent = new QWheelEvent(event->pos(),
-                                          event->globalPos(),
-                                          delta,
-                                          event->buttons(),
-                                          event->modifiers(),
-                                          event->orientation());
-    QListWidget::wheelEvent(newEvent);
+    QListWidget::wheelEvent(event);
 }
 
 void WizDocumentListView::vscrollBeginUpdate(int delta)

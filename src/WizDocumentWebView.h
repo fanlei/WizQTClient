@@ -1,4 +1,4 @@
-﻿#ifndef WIZDOCUMENTWEBVIEW_H
+#ifndef WIZDOCUMENTWEBVIEW_H
 #define WIZDOCUMENTWEBVIEW_H
 
 #include <QWebEngineView>
@@ -252,7 +252,7 @@ public:
     Q_PROPERTY(QString userAlias READ getUserAlias)
     Q_PROPERTY(QString userAvatarFilePath READ getUserAvatarFilePath)
     Q_PROPERTY(bool isPersonalDocument READ isPersonalDocument)
-    Q_PROPERTY(QString canEditNote READ canEditNote)
+    Q_PROPERTY(bool canEditNote READ canEditNote)
     Q_PROPERTY(QString currentNoteHtml READ getCurrentNoteHtml NOTIFY currentHtmlChanged STORED false)
     Q_PROPERTY(bool hasEditPermissionOnCurrentNote READ hasEditPermissionOnCurrentNote)
     //

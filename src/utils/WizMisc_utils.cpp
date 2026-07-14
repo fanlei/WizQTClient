@@ -1,4 +1,4 @@
-﻿#include "WizMisc_utils.h"
+#include "WizMisc_utils.h"
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
@@ -7,7 +7,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QMimeData>
-#include <QTextCodec>
+#include "share/WizQtCompat.h"
 
 #include "WizDef.h"
 #include "WizPinyin.h"

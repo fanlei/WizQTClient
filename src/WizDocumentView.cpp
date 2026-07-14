@@ -1,11 +1,13 @@
-﻿#include "WizDocumentView.h"
+#include "WizDocumentView.h"
 
 #include <QLineEdit>
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QStackedWidget>
 #include <QApplication>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QDesktopWidget>
+#endif
 #include <QWebEngineView>
 #include <QWebEnginePage>
 #include <QWebEngineSettings>
@@ -124,7 +126,7 @@ WizDocumentView::WizDocumentView(WizExplorerApp& app, QWidget* parent)
     m_web = new WizDocumentWebView(app, webContainer);
     m_web->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QVBoxLayout* webContainerLayout = new QVBoxLayout(webContainer);
-    webContainerLayout->setMargin(0);
+    webContainerLayout->setContentsMargins(0, 0, 0, 0);
     webContainerLayout->setSpacing(0);
     webContainerLayout->addWidget(m_web);
     //

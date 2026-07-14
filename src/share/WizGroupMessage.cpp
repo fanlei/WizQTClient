@@ -1,4 +1,5 @@
-﻿#include "WizGroupMessage.h"
+#include "WizGroupMessage.h"
+#include "WizQtCompat.h"
 
 #include "WizDatabase.h"
 #include "WizApiEntry.h"

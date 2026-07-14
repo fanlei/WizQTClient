@@ -1,6 +1,9 @@
-﻿#include "WizCategoryView.h"
+#include "WizCategoryView.h"
 
 #include <QHeaderView>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QEnterEvent>
+#endif
 #include <QAction>
 #include <QMenu>
 #include <QMessageBox>
@@ -730,7 +733,11 @@ void WizCategoryBaseView::dropEvent(QDropEvent * event)
     event->accept();
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void WizCategoryBaseView::enterEvent(QEnterEvent* event)
+#else
 void WizCategoryBaseView::enterEvent(QEvent* event)
+#endif
 {
     m_cursorEntered = true;
     QTreeWidget::enterEvent(event);
@@ -1748,7 +1755,7 @@ void setItemVisible(const QString& strXML, CategorySection section, QTreeWidget*
     {
         sectionVisible = true;
     }
-    treeWidget->setItemHidden(item, !sectionVisible);
+    item->setHidden(!sectionVisible);
 }
 
 void hideSectionItem(QTreeWidget* treewidget)
@@ -4875,10 +4882,10 @@ void WizCategoryView::initShortcut(const QString& shortcut)
     }
 
     //
-    QStringList shortcutList = shortcut.split("*", QString::SkipEmptyParts);
+    QStringList shortcutList = shortcut.split("*", Qt::SkipEmptyParts);
     for (QString param : shortcutList)
     {
-        QStringList paramList = param.split(" ", QString::SkipEmptyParts);
+        QStringList paramList = param.split(" ", Qt::SkipEmptyParts);
         if (paramList.count() < 2)
         {
             qDebug() << "Invalid shortcut data : " << paramList;

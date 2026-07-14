@@ -1,4 +1,4 @@
-﻿#include "WizMessageListView.h"
+#include "WizMessageListView.h"
 
 #include <QListWidgetItem>
 #include <QScrollBar>
@@ -12,7 +12,7 @@
 #include <QSortFilterProxyModel>
 #include <QDebug>
 #include <QApplication>
-#include <QTextCodec>
+#include "share/WizQtCompat.h"
 
 #include "share/jsoncpp/json/json.h"
 
@@ -928,15 +928,7 @@ void WizMessageListView::clearRightMenuFocus()
 
 void WizMessageListView::wheelEvent(QWheelEvent* event)
 {
-    int delta = event->delta();
-    delta = delta / 3;
-    QWheelEvent* newEvent = new QWheelEvent(event->pos(),
-                                          event->globalPos(),
-                                          delta,
-                                          event->buttons(),
-                                          event->modifiers(),
-                                          event->orientation());
-    QListWidget::wheelEvent(newEvent);
+    QListWidget::wheelEvent(event);
 }
 
 void WizMessageListView::mousePressEvent(QMouseEvent* event)
@@ -1379,7 +1371,7 @@ void WizMessageSenderSelector::addUser(const QString& userGUID)
         userSet.insert(user.alias);
         strUserId = user.userId;
     }
-    QStringList userList(userSet.toList());
+    QStringList userList(userSet.values());
     QString strText = userList.join(";");
 
     QPixmap pix;

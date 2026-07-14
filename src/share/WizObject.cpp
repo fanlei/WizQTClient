@@ -1,4 +1,4 @@
-﻿#include "WizObject.h"
+#include "WizObject.h"
 
 #include "WizMisc.h"
 #include "utils/WizLogger.h"
@@ -71,7 +71,7 @@ bool WIZUSERINFO::fromJson(const Json::Value& value)
         strNoticeText = QString::fromStdString(value["noticeText"].asString());
         strNoticeLink = QString::fromStdString(value["noticeLink"].asString());
         //
-        tVipExpried = QDateTime::fromTime_t(value["vipDate"].asInt64() / 1000);
+        tVipExpried = QDateTime::fromSecsSinceEpoch(value["vipDate"].asInt64() / 1000);
         //
         Json::Value user = value["user"];
         //
@@ -79,7 +79,7 @@ bool WIZUSERINFO::fromJson(const Json::Value& value)
         strUserMobile = QString::fromStdString(user["mobile"].asString());
         strDisplayName = QString::fromStdString(user["displayName"].asString());
         strUserGUID = QString::fromStdString(user["userGuid"].asString());
-        tCreated = QDateTime::fromTime_t(user["created"].asInt64() / 1000);
+        tCreated = QDateTime::fromSecsSinceEpoch(user["created"].asInt64() / 1000);
         //
         tTokenExpried = QDateTime::currentDateTime().addSecs(TOKEN_TIMEOUT_INTERVAL);
         //
@@ -316,7 +316,7 @@ bool WIZTAGDATA::fromJson(const Json::Value& value)
         strGUID = QString::fromStdString(value["tagGuid"].asString());
         strParentGUID = QString::fromStdString(value["parentTagGuid"].asString());
         strName = QString::fromStdString(value["name"].asString());
-        tModified = QDateTime::fromTime_t(value["modified"].asInt64() / 1000);
+        tModified = QDateTime::fromSecsSinceEpoch(value["modified"].asInt64() / 1000);
         nVersion = value["version"].asInt64();
         nPosition = value["pos"].asInt64();
         //
@@ -341,7 +341,7 @@ bool WIZTAGDATA::toJson(QString kbGuid, Json::Value& value) const
     value["tagGuid"] = strGUID.toStdString();
     value["parentTagGuid"] = strParentGUID.toStdString();
     value["name"] = strName.toStdString();
-    value["modified"] = tModified.toTime_t() * (Json::UInt64)1000;
+    value["modified"] = (Json::UInt64)(tModified.toSecsSinceEpoch() * 1000);
     value["pos"] = (int)nPosition;
     //
     return true;
@@ -393,7 +393,7 @@ bool WIZSTYLEDATA::fromJson(const Json::Value& value)
         crBackColor = WizStringToColor2(QString::fromStdString(value["backColor"].asString()));
         bTextBold = value["textBold"].asBool();
         nFlagIndex = value["flagIndex"].asInt();
-        tModified = QDateTime::fromTime_t(value["modified"].asInt64() / 1000);
+        tModified = QDateTime::fromSecsSinceEpoch(value["modified"].asInt64() / 1000);
         nVersion = value["version"].asInt64();
 
     } catch (Json::Exception& e) {
@@ -415,7 +415,7 @@ bool WIZSTYLEDATA::toJson(QString kbGuid, Json::Value& value) const
     value["backColor"] = ::WizColorToString(crBackColor).toStdString();
     value["textBold"] = bTextBold ? true : false;
     value["flagIndex"] = nFlagIndex;
-    value["modified"] = tModified.toTime_t() * (Json::UInt64)1000;
+    value["modified"] = (Json::UInt64)(tModified.toSecsSinceEpoch() * 1000);
     //
     return true;
 }
@@ -444,7 +444,7 @@ bool WIZDELETEDGUIDDATA::fromJson(const Json::Value& value)
 {
     try {
         //
-        tDeleted = QDateTime::fromTime_t(value["created"].asInt64() / 1000);
+        tDeleted = QDateTime::fromSecsSinceEpoch(value["created"].asInt64() / 1000);
         strGUID = QString::fromStdString(value["deletedGuid"].asString());
         strKbGUID = QString::fromStdString(value["kbGuid"].asString());
         QString strType = QString::fromStdString(value["type"].asString());
@@ -470,7 +470,7 @@ bool WIZDELETEDGUIDDATA::toJson(QString kbGuid, Json::Value& value) const
 
     value["deletedGuid"] = strGUID.toStdString();
     value["type"] = WIZOBJECTDATA::objectTypeToTypeString(eType).toStdString();
-    value["created"] = tDeleted.toTime_t() * (Json::UInt64)1000;
+    value["created"] = (Json::UInt64)(tDeleted.toSecsSinceEpoch() * 1000);
     return true;
 }
 
@@ -499,8 +499,8 @@ bool WIZDOCUMENTATTACHMENTDATA::fromJson(const Json::Value& value)
         strURL = QString::fromStdString(value["url"].asString());
         strDataMD5 = QString::fromStdString(value["dataMd5"].asString());
         strInfoMD5 = QString::fromStdString(value["infoMd5"].asString());
-        tInfoModified = QDateTime::fromTime_t(value["infoModified"].asInt64() / 1000);
-        tDataModified = QDateTime::fromTime_t(value["dataModified"].asInt64() / 1000);
+        tInfoModified = QDateTime::fromSecsSinceEpoch(value["infoModified"].asInt64() / 1000);
+        tDataModified = QDateTime::fromSecsSinceEpoch(value["dataModified"].asInt64() / 1000);
 
     } catch (Json::Exception& e) {
         TOLOG(e.what());
@@ -609,9 +609,9 @@ bool WIZDOCUMENTDATAEX::fromJson(const Json::Value& value)
         nProtected = value["protected"].asInt();
         nAttachmentCount = value["attachmentCount"].asInt();
         //
-        tCreated = QDateTime::fromTime_t(value["created"].asInt64() / 1000);
-        tModified = QDateTime::fromTime_t(value["modified"].asInt64() / 1000);
-        tDataModified = QDateTime::fromTime_t(value["dataModified"].asInt64() / 1000);
+        tCreated = QDateTime::fromSecsSinceEpoch(value["created"].asInt64() / 1000);
+        tModified = QDateTime::fromSecsSinceEpoch(value["modified"].asInt64() / 1000);
+        tDataModified = QDateTime::fromSecsSinceEpoch(value["dataModified"].asInt64() / 1000);
 
         strHtml = QString::fromStdString(value["html"].asString());
 
@@ -687,9 +687,9 @@ bool WIZGROUPDATA::fromJson(const Json::Value& value)
         strKbServer = QString::fromStdString(value["kbServer"].asString());
         bizGUID = QString::fromStdString(value["bizGuid"].asString());
         bizName = QString::fromStdString(value["bizName"].asString());
-        tCreated = QDateTime::fromTime_t(value["created"].asInt64() / 1000);
-        tModified = QDateTime::fromTime_t(value["modified"].asInt64() / 1000);
-        tRoleCreated = QDateTime::fromTime_t(value["roleCreated"].asInt64() / 1000);
+        tCreated = QDateTime::fromSecsSinceEpoch(value["created"].asInt64() / 1000);
+        tModified = QDateTime::fromSecsSinceEpoch(value["modified"].asInt64() / 1000);
+        tRoleCreated = QDateTime::fromSecsSinceEpoch(value["roleCreated"].asInt64() / 1000);
         strGroupGUID = QString::fromStdString(value["kbGuid"].asString());
         strId = QString::fromStdString(value["id"].asString());
         strGroupName = QString::fromStdString(value["name"].asString());

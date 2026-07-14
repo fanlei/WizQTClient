@@ -1,4 +1,4 @@
-﻿#include "WizUIHelper.h"
+#include "WizUIHelper.h"
 
 #include <QtWidgets>
 
@@ -66,7 +66,11 @@ public:
         return QSize(1, 1);
     }
 protected:
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    void enterEvent(QEnterEvent* ev)
+#else
     void enterEvent(QEvent* ev)
+#endif
     {
         QWidget::enterEvent(ev);
         setCursor(Qt::SplitHCursor);

@@ -1,9 +1,8 @@
-﻿#include "WizTitleBar.h"
+#include "WizTitleBar.h"
 
 #include <QVBoxLayout>
 #include <QUrl>
 #include <QMenu>
-#include <QNetworkConfigurationManager>
 #include <QMessageBox>
 #include <QSplitter>
 #include <QList>

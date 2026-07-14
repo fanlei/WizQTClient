@@ -1,4 +1,4 @@
-﻿#include "WizUI.h"
+#include "WizUI.h"
 
 #include <QPainter>
 #include <QWidget>
@@ -287,7 +287,7 @@ QWidget* WizInitWidgetMarginsEx(const QString& strSkinName, QWidget* widget, con
     QLayout* layout = new QBoxLayout(QBoxLayout::LeftToRight, wrap);
 
     wrap->setLayout(layout);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     WizInitWidgetMargins(strSkinName, wrap, name);
     layout->addWidget(widget);

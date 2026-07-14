@@ -1,8 +1,8 @@
-﻿#include "WizConsoleDialog.h"
+#include "WizConsoleDialog.h"
 #include "ui_WizConsoleDialog.h"
 
 #include <QScrollBar>
-#include <QTextCodec>
+#include "share/WizQtCompat.h"
 #include <QFileDialog>
 #include <QClipboard>
 #include <QTextEdit>

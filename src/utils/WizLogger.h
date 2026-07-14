@@ -1,9 +1,10 @@
-﻿#ifndef UTILS_LOGGER_H
+#ifndef UTILS_LOGGER_H
 #define UTILS_LOGGER_H
 
 #include <QtGlobal>
 #include <QObject>
 #include <QMutex>
+#include <QRecursiveMutex>
 #include <QtCore/qalgorithms.h>
 #include <QtCore/qhash.h>
 #include <QtCore/qlist.h>
@@ -43,7 +44,7 @@ Q_SIGNALS:
     void readyRead();
 
 private:
-    QMutex m_mutex;
+    QRecursiveMutex m_mutex;
     QBuffer* m_buffer;
 
     void getAll(QString& text);

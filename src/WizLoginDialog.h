@@ -1,4 +1,4 @@
-﻿#ifndef WIZLOGINWIDGET_H
+#ifndef WIZLOGINWIDGET_H
 #define WIZLOGINWIDGET_H
 
 #include <QDialog>
@@ -13,6 +13,9 @@
 #endif
 
 class QLabel;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+class QEnterEvent;
+#endif
 class QState;
 class QHistoryState;
 class WizSkin9GridImage;
@@ -54,7 +57,11 @@ public:
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    void enterEvent(QEnterEvent* event);
+#else
     void enterEvent(QEvent * event);
+#endif
     void leaveEvent(QEvent * event);
     void paintEvent(QPaintEvent*);
 

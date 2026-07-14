@@ -1,13 +1,14 @@
-﻿#include "WizDatabase.h"
+#include "WizDatabase.h"
 
 #include <QDir>
 #include <QUrl>
 #include <QDebug>
-#include <QTextCodec>
+#include "WizQtCompat.h"
 #include <algorithm>
 #include <QSettings>
 #include <QMessageBox>
 #include <QMimeData>
+#include <QRecursiveMutex>
 #include <QApplication>
 #include <QClipboard>
 #include <QDateTime>
@@ -75,7 +76,7 @@ QString GetResoucePathFromFile(const QString& strHtmlFileName)
 class WizUserCertPassword
 {
 private:
-    WizUserCertPassword() : m_mutex(QMutex::Recursive){}
+    WizUserCertPassword() {}
 public:
     static WizUserCertPassword& Instance()
     {
@@ -84,7 +85,7 @@ public:
     }
 private:
     std::map<QString, QString> m_passwords;
-    QMutex m_mutex;
+    QRecursiveMutex m_mutex;
 public:
     void setPassword(const QString& strBizGUID, const QString& strPassword)
     {
@@ -618,7 +619,6 @@ const QString g_strDatabaseInfoSection = "Database";
 WizDatabase::WizDatabase()
     : m_ziwReader(new WizZiwReader())
     , m_bIsPersonal(true)
-    , m_mutexCache(QMutex::Recursive)
 {
     m_ziwReader->setDatabase(this);
 }
@@ -1319,7 +1319,7 @@ bool WizDatabase::createConflictedCopy(const QString& strObjectGUID,
 
 bool WizDatabase::saveLastSyncTime()
 {
-    uint secs = QDateTime::currentDateTime().toTime_t();
+    uint secs = QDateTime::currentDateTime().toSecsSinceEpoch();
     return setMeta("SYNC_INFO", "TIME", QString::number(secs));
 }
 
@@ -1760,7 +1760,7 @@ void WizDatabase::setFolders(const QString& strFolders, qint64 nVersion, bool bS
         return;
 
     std::set<CString> setServerFolders;
-    QStringList listFolders = strFolders.split('*', QString::SkipEmptyParts);
+    QStringList listFolders = strFolders.split('*', Qt::SkipEmptyParts);
     for (QStringList::const_iterator it = listFolders.begin();
          it != listFolders.end();
          it++)

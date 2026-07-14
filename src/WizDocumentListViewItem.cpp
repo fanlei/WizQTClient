@@ -1,4 +1,4 @@
-﻿#include "WizDocumentListViewItem.h"
+#include "WizDocumentListViewItem.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -553,7 +553,7 @@ QString WizDocumentListViewDocumentItem::cacheKey() const
         stat = "Normal";
     }
 
-    return "ListItem::" + m_data.doc.strGUID + "::" + view->viewType() + "::" + stat;
+    return "ListItem::" + m_data.doc.strGUID + "::" + QString::number(view->viewType()) + "::" + stat;
 }
 
 const int nTextTopMargin = 6;

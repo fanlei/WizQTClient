@@ -1,12 +1,13 @@
-﻿#ifndef WIZSERVICE_TOKEN_P_H
+#ifndef WIZSERVICE_TOKEN_P_H
 #define WIZSERVICE_TOKEN_P_H
 
 #include <QObject>
+#include <QRecursiveMutex>
 #include "../share/WizObject.h"
 
 class QString;
 class QDateTime;
-class QMutex;
+class QRecursiveMutex;
 
 struct WIZUSERINFO;
 
@@ -39,7 +40,7 @@ private:
     QString m_strUserId;
     QString m_strPasswd;
     bool m_bProcessing;
-    QMutex* m_mutex;
+    QRecursiveMutex* m_mutex;
     int m_lastErrorCode;
     QString m_lastErrorMessage;
     bool m_bLastIsNetworkError;

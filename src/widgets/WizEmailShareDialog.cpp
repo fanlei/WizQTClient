@@ -1,10 +1,11 @@
-﻿#include "WizEmailShareDialog.h"
+#include "WizEmailShareDialog.h"
 #include "ui_WizEmailShareDialog.h"
 #include <QListWidget>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QEventLoop>
-#include <QTextCodec>
+#include "share/WizQtCompat.h"
+#include <QRegularExpression>
 #include <QPixmap>
 #include <QVBoxLayout>
 #include <QDebug>
@@ -198,7 +199,7 @@ void WizEmailShareDialog::processReturnMessage(const QString& returnMessage, int
 void WizEmailShareDialog::saveContacts()
 {
     QString strText = ui->lineEdit_to->text();
-    QStringList toList = strText.split(QRegExp(",|;"));
+    QStringList toList = strText.split(QRegularExpression(",|;"));
     QString strContact = m_app.userSettings().get(EMAIL_CONTACTS);
     foreach (QString str, toList)
     {

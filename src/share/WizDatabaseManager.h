@@ -1,10 +1,11 @@
-﻿#ifndef WIZDATABASEMANAGER_H
+#ifndef WIZDATABASEMANAGER_H
 #define WIZDATABASEMANAGER_H
 
 #include <QObject>
 #include <QPointer>
 #include <QMap>
 #include <QMutex>
+#include <QRecursiveMutex>
 #include <deque>
 
 class QString;
@@ -54,7 +55,7 @@ public:
     void closeAll();
 
 private:
-    QMutex m_mutex;
+    QRecursiveMutex m_mutex;
     QString m_strAccountFolderName;
     QPointer<WizDatabase> m_dbPrivate;
     QMap<QString, WizDatabase*> m_mapGroups;

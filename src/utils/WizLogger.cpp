@@ -1,4 +1,4 @@
-﻿#include "WizLogger.h"
+#include "WizLogger.h"
 
 #include <QString>
 #include <QStringList>
@@ -7,6 +7,7 @@
 #include <QDate>
 #include <QDebug>
 #include <QBuffer>
+#include <QRecursiveMutex>
 #include <QTextStream>
 #include <iostream>
 #include <fstream>
@@ -20,8 +21,7 @@
 namespace Utils {
 
 WizLogger::WizLogger()
-    : m_mutex(QMutex::Recursive)
-    , m_buffer(new QBuffer())
+    : m_buffer(new QBuffer())
 {
     connect(m_buffer, SIGNAL(readyRead()), SLOT(onBuffer_readRead()));
 }

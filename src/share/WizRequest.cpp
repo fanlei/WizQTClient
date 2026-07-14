@@ -1,4 +1,4 @@
-﻿#include "WizRequest.h"
+#include "WizRequest.h"
 #include "WizEventLoop.h"
 
 #include <QByteArray>
@@ -39,7 +39,9 @@ bool WizRequest::execJsonRequest(const QString& url, QString method, const QByte
     QNetworkAccessManager net;
     QNetworkRequest request;
     request.setUrl(url);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+#endif
     //
     QNetworkReply* reply = NULL;
     if (method == "POST")

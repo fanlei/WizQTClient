@@ -1,4 +1,4 @@
-﻿#ifndef WIZCATEGORYCTRL_H
+#ifndef WIZCATEGORYCTRL_H
 #define WIZCATEGORYCTRL_H
 
 #include <QPointer>
@@ -6,6 +6,9 @@
 #include <QTreeView>
 #include "WizCategoryViewItem.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+class QEnterEvent;
+#endif
 class WizFolder;
 class WizScrollBar;
 class WizDatabaseManager;
@@ -84,7 +87,11 @@ protected:
 
 
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    virtual void enterEvent(QEnterEvent* event);
+#else
     virtual void enterEvent(QEvent * event);
+#endif
     virtual void leaveEvent(QEvent * event);
 
     virtual void resizeEvent(QResizeEvent* event);

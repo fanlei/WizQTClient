@@ -1,4 +1,4 @@
-﻿#include "WizSearch.h"
+#include "WizSearch.h"
 
 #include <QFile>
 #include <QMetaType>
@@ -32,7 +32,6 @@
 WizSearcher::WizSearcher(WizDatabaseManager& dbMgr, QObject *parent)
     : QThread(parent)
     , m_dbMgr(dbMgr)
-    , m_mutexWait(QMutex::NonRecursive)
     , m_stop(false)
 {
     qRegisterMetaType<CWizDocumentDataArray>("CWizDocumentDataArray");
@@ -332,7 +331,8 @@ void WizSearcher::searchByKeywordAndWhere(const QString& strKeywords,
         arrayDocument.clear();
     }
 
-    QSet<QString> keywordSet = m_mapDocumentSearched.keys().toSet();
+    QList<QString> keys = m_mapDocumentSearched.keys();
+    QSet<QString> keywordSet(keys.begin(), keys.end());
 
     keywordSet.intersect(whereSet);
 
@@ -386,7 +386,7 @@ void WizSearcher::emitSearchProcess(const QString& strKeywords)
         CWizDocumentDataArray arrayDocument;
         QMap<QString, WIZDOCUMENTDATAEX>::const_iterator it;
         int nCounter = 0;
-        for (it = m_mapDocumentSearched.begin() + nPos; it != m_mapDocumentSearched.end() && nCounter < SEARCH_PAGE_MAX; it++, nCounter ++) {
+        for (it = std::next(m_mapDocumentSearched.begin(), nPos); it != m_mapDocumentSearched.end() && nCounter < SEARCH_PAGE_MAX; it++, nCounter ++) {
             arrayDocument.push_back(it.value());
             nPos++;
         }

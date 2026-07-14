@@ -1,4 +1,4 @@
-﻿#include "WizMobileFileReceiver.h"
+#include "WizMobileFileReceiver.h"
 #include <QUdpSocket>
 #include <QTcpSocket>
 #include <QXmlStreamReader>
@@ -102,7 +102,7 @@ void WizMobileXmlProcesser::processXML(const QByteArray& datagram)
 
         if(token == QXmlStreamReader::StartElement)
         {
-            if(xml.name() == "file")
+            if(xml.name() == QLatin1String("file"))
             {
                 processFileParam(xml);
             }
@@ -122,35 +122,35 @@ void WizMobileXmlProcesser::processFileParam(QXmlStreamReader& xml)
     int index;
 
     while(!(xml.tokenType() == QXmlStreamReader::EndElement &&
-            xml.name() == "file"))
+            xml.name() == QLatin1String("file")))
     {
         if(xml.tokenType() == QXmlStreamReader::StartElement)
         {
-            if(xml.name() == "guid")
+            if(xml.name() == QLatin1String("guid"))
             {
                 guid = getElementText(xml);
             }
-            else if(xml.name() == "name")
+            else if(xml.name() == QLatin1String("name"))
             {
                 newSeg.name = getElementText(xml);
             }
-            else if(xml.name() == "type")
+            else if(xml.name() == QLatin1String("type"))
             {
                 newSeg.type = getElementText(xml);
             }
-            else if(xml.name() == "length")
+            else if(xml.name() == QLatin1String("length"))
             {
                 newSeg.length = getElementText(xml).toLong();
             }
-            else if(xml.name() == "index")
+            else if(xml.name() == QLatin1String("index"))
             {
                 index = getElementText(xml).toInt();
             }
-            else if(xml.name() == "count")
+            else if(xml.name() == QLatin1String("count"))
             {
                 newSeg.totalCount = getElementText(xml).toInt();
             }
-            else if(xml.name() == "data")
+            else if(xml.name() == QLatin1String("data"))
             {
                 newSeg.data = QByteArray::fromBase64(getElementText(xml).toUtf8());
             }

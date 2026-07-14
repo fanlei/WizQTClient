@@ -1,4 +1,4 @@
-﻿#include "WizCellButton.h"
+#include "WizCellButton.h"
 
 #include <QString>
 #include <QPainter>
@@ -211,7 +211,7 @@ int WizRoundCellButton::buttonWidth() const
     f.setPixelSize(WizSmartScaleUI(RoundCellButtonConst::fontSize));
     QFontMetrics fm(f);
     int width = RoundCellButtonConst::margin * 2.5 + RoundCellButtonConst::spacing
-            + m_iconSize.width() + fm.width(text());
+            + m_iconSize.width() + fm.horizontalAdvance(text());
     return width;
 }
 

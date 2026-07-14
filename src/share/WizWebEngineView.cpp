@@ -1,4 +1,4 @@
-﻿#include <QWebEngineView>
+#include <QWebEngineView>
 #include <QWebSocketServer>
 #include <QWebChannel>
 #include "WizWebEngineView.h"
@@ -284,14 +284,13 @@ QString toArgument(const QVariant& v)
         return QString("%1").arg(v.toLongLong());
     case QVariant::Double: {
         double f = v.toDouble();
-        QString str;
-        str.sprintf("%f", f);
+        QString str = QString::asprintf("%f", f);
         return str;
     }
     case QVariant::Date:
     case QVariant::Time:
     case QVariant::DateTime:
-        return QString("new Date(%1)").arg(v.toDateTime().toTime_t() * 1000);
+        return QString("new Date(%1)").arg(v.toDateTime().toSecsSinceEpoch() * 1000);
     case QVariant::String: {
             QString s = v.toString();
             s.replace("\\", "\\\\");
@@ -469,7 +468,7 @@ void WizWebEngineView::wheelEvent(QWheelEvent *event)
 
     if (event->modifiers()==Qt::ControlModifier) {
         factor = zoomFactor();
-        if (event->delta() > 0) {
+        if (event->angleDelta().y() > 0) {
             //放大
             factor += 0.1;
             factor = (factor > 5.0)?5.0:factor;

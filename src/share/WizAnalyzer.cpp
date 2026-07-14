@@ -1,4 +1,4 @@
-﻿#include "WizAnalyzer.h"
+#include "WizAnalyzer.h"
 #include <QMutexLocker>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -6,7 +6,6 @@
 #include <QEventLoop>
 #include <QSettings>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QFile>
 #include <QDataStream>
 #include <QDebug>

@@ -1,4 +1,5 @@
-﻿#include "WizUpgrade.h"
+#include "WizUpgrade.h"
+#include "share/WizQtCompat.h"
 
 #include "share/WizMisc.h"
 #include "utils/WizLogger.h"

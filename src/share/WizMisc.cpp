@@ -1,5 +1,7 @@
-﻿#include "WizSettings.h"
+#include "WizSettings.h"
 #include "WizWebSettingsDialog.h"
+#include "WizQtCompat.h"
+#include <QRegularExpression>
 
 #include <algorithm>
 #include <fstream>
@@ -18,7 +20,9 @@
 #include <QSvgRenderer>
 #include <QDomDocument>
 #include <QtCore>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QNetworkConfigurationManager>
+#endif
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -424,7 +428,7 @@ CString WizIntToStr(int n)
 
 QString WizGetTimeStamp()
 {
-    return QString::number(QDateTime::currentDateTime().toTime_t());
+    return QString::number(QDateTime::currentDateTime().toSecsSinceEpoch());
 }
 
 WizOleDateTime WizGetCurrentTime()
@@ -535,7 +539,7 @@ CString WizIntToHexEx(int n, int nWidth, BOOL bWithPrefix /*= FALSE*/)
     CString strFormat = CString("%0") + WizIntToStr(nWidth) + "X";
     //
     CString strValue;
-    strValue.sprintf(strFormat.toUtf8(), n);
+    strValue = QString::asprintf(strFormat.toUtf8().constData(), n);
     //
     if (bWithPrefix)
     {
@@ -741,7 +745,7 @@ CString WizFormatInt(__int64 n)
 
 time_t WizTimeGetTimeT(const WizOleDateTime& t)
 {
-    return t.toTime_t();
+    return t.toSecsSinceEpoch();
 }
 
 CString WizStringToSQL(const CString& str)
@@ -1128,7 +1132,9 @@ bool WizLoadUtf8TextFromFile(const QString& strFileName, QString& strText)
         return false;
 
     QTextStream stream(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     stream.setCodec("UTF-8");
+#endif
     strText = stream.readAll();
     file.close();
 
@@ -1168,7 +1174,9 @@ bool WizSaveUnicodeTextToUtf8File(const QString& strFileName, const QString& str
         return false;
 
     QTextStream stream(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     stream.setCodec("UTF-8");
+#endif
     stream.setGenerateByteOrderMark(true);
     stream << strText;
     stream.flush();
@@ -1184,7 +1192,9 @@ bool WizSaveUnicodeTextToUtf8File(const QString& strFileName, const QByteArray& 
         return false;
 
     QTextStream stream(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     stream.setCodec("UTF-8");
+#endif
     stream.setGenerateByteOrderMark(true);
     stream << strText;
     stream.flush();
@@ -1201,7 +1211,9 @@ bool WizSaveUnicodeTextToUtf8File(const QString& strFileName, const QString& str
         return false;
 
     QTextStream stream(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     stream.setCodec("UTF-8");
+#endif
     stream.setGenerateByteOrderMark(addBom ? true : false);
     stream << strText;
     stream.flush();
@@ -1213,7 +1225,9 @@ bool WizSaveUnicodeTextToUtf8File(const QString& strFileName, const QString& str
 bool WizSaveUnicodeTextToData(QByteArray& data, const QString& strText, bool addBom)
 {
     QTextStream stream(&data);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     stream.setCodec("UTF-8");
+#endif
     stream.setGenerateByteOrderMark(addBom ? true : false);
     stream << strText;
     stream.flush();
@@ -1223,14 +1237,14 @@ bool WizSaveUnicodeTextToData(QByteArray& data, const QString& strText, bool add
 
 BOOL WizSplitTextToArray(const CString& strText, QChar ch, CWizStdStringArray& arrayResult)
 {
-    QStringList strings = strText.split(ch, QString::SkipEmptyParts);
+    QStringList strings = strText.split(ch, Qt::SkipEmptyParts);
     arrayResult.assign(strings.begin(), strings.end());
     return TRUE;
 }
 
 BOOL WizSplitTextToArray(CString strText, const CString& strSplitterText, BOOL bMatchCase, CWizStdStringArray& arrayResult)
 {
-    QStringList strings = strText.split(strSplitterText, QString::KeepEmptyParts, bMatchCase ? Qt::CaseSensitive : Qt::CaseInsensitive);
+    QStringList strings = strText.split(strSplitterText, Qt::KeepEmptyParts, bMatchCase ? Qt::CaseSensitive : Qt::CaseInsensitive);
     arrayResult.assign(strings.begin(), strings.end());
     return TRUE;
 }
@@ -1385,7 +1399,7 @@ BOOL WizStringSimpleSplit(const CString& str, char ch, CString& strLeft, CString
 CString WizDateToLocalString(const WizOleDateTime& t)
 {
     WizOleDateTime localDateTime = t.toLocalTime();
-    return localDateTime.toString(Qt::DefaultLocaleShortDate);
+    return QLocale().toString(localDateTime, QLocale::ShortFormat);
 }
 
 intptr_t WizStrStrI_Pos(const CString& str, const CString& strFind, int nStart /*= 0*/)
@@ -1965,7 +1979,7 @@ inline bool WizConvertTextToHTML_ForPaste_ProcessSpaceBeginEnd(int nBegin, QStri
         //
         QChar ch = strLine[i];
         //
-        QChar chNext = 0;
+        QChar chNext;
         if (i < strLine.length() - 1)
         {
             chNext = strLine[i + 1];
@@ -2387,8 +2401,12 @@ void WizShowWebDialogWithTokenDelayed(const QString& windowTitle, const QString&
 
 bool WizIsOffline()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return false;
+#else
     QNetworkConfigurationManager mgr;
     return !mgr.isOnline();
+#endif
 }
 
 class SleepThread : public QThread
@@ -2442,13 +2460,13 @@ bool WizIsKMURLOpenDocument(const QString& strURL)
 QString WizGetHtmlBodyContent(const QString& strHtml)
 {
     QString strBody = strHtml;
-    QRegExp regBodyContant("<body[^>]*>[\\s\\S]*</body>");
-    int index = regBodyContant.indexIn(strBody);
-    if (index > -1)
+    QRegularExpression regBodyContant("<body[^>]*>[\\s\\S]*</body>");
+    QRegularExpressionMatch match = regBodyContant.match(strBody);
+    if (match.hasMatch())
     {
-        strBody = regBodyContant.cap(0);
+        strBody = match.captured(0);
 
-        QRegExp regBody = QRegExp("</?body[^>]*>", Qt::CaseInsensitive);
+        QRegularExpression regBody("</?body[^>]*>", QRegularExpression::CaseInsensitiveOption);
         strBody.replace(regBody, "");
     }
 
@@ -2457,16 +2475,16 @@ QString WizGetHtmlBodyContent(const QString& strHtml)
 
 bool WizGetBodyContentFromHtml(QString& strHtml, bool bNeedTextParse)
 {
-    QRegExp regHead("</?head[^>]*>", Qt::CaseInsensitive);
+    QRegularExpression regHead("</?head[^>]*>", QRegularExpression::CaseInsensitiveOption);
     if (strHtml.contains(regHead))
     {
         if (bNeedTextParse)
         {
-            QRegExp regHeadContant("<head[^>]*>[\\s\\S]*</head>");
-            int headIndex = regHeadContant.indexIn(strHtml);
-            if (headIndex > -1)
+            QRegularExpression regHeadContant("<head[^>]*>[\\s\\S]*</head>");
+            QRegularExpressionMatch matchHead = regHeadContant.match(strHtml);
+            if (matchHead.hasMatch())
             {
-                QString strHead = regHeadContant.cap(0);
+                QString strHead = matchHead.captured(0);
                 if (strHead.contains("Cocoa HTML Writer"))
                 {
                     // convert mass html to rtf, then convert rft to html
@@ -2670,7 +2688,7 @@ bool WizCreateThumbnailForAttachment(QImage& img, const QString& attachFileName,
     QFont font;
     font.setPixelSize(FONTSIZE);
     QFontMetrics fm(font);
-    int nTextWidth = fm.width(dateInfo + fileSize);
+    int nTextWidth = fm.horizontalAdvance(dateInfo + fileSize);
     int nWidth = nTextWidth + nIconMargin * 4 - 4 + iconSize.width();
     int nHeight = iconSize.height() + nIconMargin * 2;
 
@@ -2710,7 +2728,7 @@ bool WizCreateThumbnailForAttachment(QImage& img, const QString& attachFileName,
     p.setPen(QColor("#888888"));
     p.drawText(infoRect, dateInfo);
 
-    int dateWidth = fm.width(dateInfo);
+    int dateWidth = fm.horizontalAdvance(dateInfo);
     infoRect.adjust(dateWidth + 4, 0, 0, 0);
     QPixmap pixGreyPoint(Utils::WizStyleHelper::loadPixmap("document_grey_point"));
     QRect rcPix = infoRect.adjusted(0, 6, 0, 0);
@@ -3051,7 +3069,9 @@ bool WizURLDownloadToData(const QString& url, QByteArray& data)
     do
     {
         QNetworkRequest request(newUrl);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+#endif
         //
         reply = netCtrl.get(request);
         WizAutoTimeOutEventLoop loop(reply);

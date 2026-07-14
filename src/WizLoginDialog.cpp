@@ -1,7 +1,11 @@
-﻿#include "WizLoginDialog.h"
+#include "WizLoginDialog.h"
+#include "share/WizQtCompat.h"
 #include "ui_WizLoginDialog.h"
 #include <QPainter>
 #include <QMouseEvent>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QEnterEvent>
+#endif
 #include <QMenu>
 #include <QBitmap>
 #include <QToolButton>
@@ -1850,7 +1854,9 @@ QString WizOEMDownloader::_downloadOEMSettings()
     WizCommonApiEntry::setEnterpriseServerIP(m_server);
     QString strUrl = WizCommonApiEntry::makeUpUrlFromCommand("oem");
     QNetworkRequest req(strUrl);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     req.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+#endif
     QNetworkReply* reply = net.get(req);
     qDebug() << "get oem from server : " << strUrl;
 
@@ -2046,7 +2052,11 @@ void WizActionWidget::mouseReleaseEvent(QMouseEvent* event)
     QWidget::mouseReleaseEvent(event);
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void WizActionWidget::enterEvent(QEnterEvent* event)
+#else
 void WizActionWidget::enterEvent(QEvent* event)
+#endif
 {
     m_deleteButton->setVisible(true);
     QWidget::enterEvent(event);
@@ -2063,7 +2073,7 @@ void WizActionWidget::paintEvent(QPaintEvent * event)
     Q_UNUSED(event);
     //
     QStyleOption opt;
-    opt.init(this);
+    opt.initFrom(this);
     QPainter p(this);
 
     QRect rcText = opt.rect;

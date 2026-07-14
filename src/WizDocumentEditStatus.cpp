@@ -1,4 +1,4 @@
-﻿#include "WizDocumentEditStatus.h"
+#include "WizDocumentEditStatus.h"
 #include "sync/WizApiEntry.h"
 #include "sync/WizToken.h"
 #include "share/WizMisc.h"
@@ -11,7 +11,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QEventLoop>
-#include <QTextCodec>
+#include "share/WizQtCompat.h"
 
 #include <QDebug>
 

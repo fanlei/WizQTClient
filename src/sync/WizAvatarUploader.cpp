@@ -1,4 +1,4 @@
-﻿#include "WizAvatarUploader.h"
+#include "WizAvatarUploader.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -6,6 +6,7 @@
 #include <QImage>
 #include <QString>
 #include <QDir>
+#include <QRandomGenerator>
 #include <QDebug>
 
 #include "WizApiEntry.h"
@@ -28,7 +29,7 @@ QString WizAvatarUploader::convert2Avatar(const QString& strFileName)
         image = image.scaled(100, 100, Qt::IgnoreAspectRatio);
     }
 
-    QString strTempAvatar = QDir::tempPath() + "/" + QString::number(qrand()) + ".png";
+    QString strTempAvatar = QDir::tempPath() + "/" + QString::number(QRandomGenerator::global()->generate()) + ".png";
     if (!image.save(strTempAvatar))
         return QString();
 
@@ -99,7 +100,7 @@ void WizAvatarUploader::upload_impl(const QString& strUrl,
     loop.exec();
 
     if (reply->error()) {
-        m_strError = "network error! code = " + QString(reply->error());
+        m_strError = "network error! code = " + QString::number(reply->error());
         Q_EMIT uploaded(false);
         return;
     }

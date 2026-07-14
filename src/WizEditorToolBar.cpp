@@ -1,4 +1,4 @@
-﻿#include "WizEditorToolBar.h"
+#include "WizEditorToolBar.h"
 
 #include <QStylePainter>
 #include <QToolButton>
@@ -18,6 +18,9 @@
 #include <QFontDialog>
 #include <QDebug>
 #include <QWidgetAction>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QEnterEvent>
+#endif
 #include <QActionGroup>
 
 #include <QPixmap>
@@ -567,7 +570,7 @@ void WizDblclickableToolButton::mouseDoubleClickEvent(QMouseEvent *event)
 void WizDblclickableToolButton::mouseReleaseEvent(QMouseEvent* event)
 {
     QDateTime now = QDateTime::currentDateTime();
-    int seconds = now.toTime_t() - m_tDblClicked.toTime_t();
+    int seconds = now.toSecsSinceEpoch() - m_tDblClicked.toSecsSinceEpoch();
     if (seconds < 1) {
         event->ignore();
     } else {
@@ -646,7 +649,11 @@ protected:
         update();
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    virtual void enterEvent(QEnterEvent* event)
+#else
     virtual void enterEvent(QEvent* event)
+#endif
     {
         WizDblclickableToolButton::enterEvent(event);
 
@@ -893,7 +900,11 @@ public:
         , m_position(NoPosition)
     {
         setFocusPolicy(Qt::NoFocus);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        setSizeAdjustPolicy(QComboBox::AdjustToContents);
+#else
         setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLength);
+#endif
         QFont f = font();
         f.setPixelSize(Utils::WizStyleHelper::editComboFontSize());
         setFont(f);
@@ -981,7 +992,11 @@ protected:
         update();
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    virtual void enterEvent(QEnterEvent* event) {
+#else
     virtual void enterEvent(QEvent* event) {
+#endif
         QComboBox::enterEvent(event);
 
         update();
@@ -1114,7 +1129,11 @@ public:
         , m_isPopup(false)
     {
         setFocusPolicy(Qt::NoFocus);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        setSizeAdjustPolicy(QComboBox::AdjustToContents);
+#else
         setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLength);
+#endif
         setEditable(false);
     }
 
@@ -1335,7 +1354,7 @@ WizEditorToolBar::WizEditorToolBar(WizExplorerApp& app, QWidget *parent)
     }
 #endif
 
-    QStringList fontList = m_app.userSettings().get(WIZRECENTFONTLIST).split('/', QString::SkipEmptyParts);
+    QStringList fontList = m_app.userSettings().get(WIZRECENTFONTLIST).split('/', Qt::SkipEmptyParts);
     WizComboboxStyledItem* fontFamilyItems = FontFamilies();
     for (QString recent : fontList)
     {
@@ -2278,7 +2297,7 @@ void WizEditorToolBar::on_delegate_showContextMenuRequest(const QPoint& pos)
     if (!page)
         return;
     //
-    QMenu *menu = page->createStandardContextMenu();
+    QMenu *menu = m_editor->createStandardContextMenu();
     if (!menu)
         return;
     //
@@ -2723,7 +2742,7 @@ void WizEditorToolBar::selectCurrentFontFamily(const QString& strFontFamily)
         }
     }
 
-    QStringList fontList = m_app.userSettings().get(WIZRECENTFONTLIST).split('/', QString::SkipEmptyParts);
+    QStringList fontList = m_app.userSettings().get(WIZRECENTFONTLIST).split('/', Qt::SkipEmptyParts);
     for (QString recent : fontList)
     {
         if (recent == strFontFamily)

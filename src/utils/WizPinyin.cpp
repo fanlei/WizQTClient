@@ -1,4 +1,4 @@
-﻿#include "WizPinyin.h"
+#include "WizPinyin.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -187,7 +187,7 @@ int WizToolsChinese2PinYinEx(const wchar_t* lpszText, UINT flags, const char* lp
 			}
 			else
 			{
-				arr.push_back(CString(ch));
+				arr.push_back(CString(QChar(ch)));
 			}
 			//
 			p++;

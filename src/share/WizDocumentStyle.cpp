@@ -1,19 +1,19 @@
-﻿#include "WizDocumentStyle.h"
+#include "WizDocumentStyle.h"
 #include "WizDatabase.h"
 #include "WizDatabaseManager.h"
 #include "../utils/WizLogger.h"
 
 #include <QMutex>
+#include <QRecursiveMutex>
 #include <QMutexLocker>
 
 class WizDocumentStylePrivate
 {
 private:
-    QMutex m_mutex;
+    QRecursiveMutex m_mutex;
     std::map<QString, WIZSTYLEDATA> m_styles;
 public:
     WizDocumentStylePrivate()
-        : m_mutex(QMutex::Recursive)
     {
     }
 

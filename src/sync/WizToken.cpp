@@ -1,7 +1,8 @@
-﻿#include "WizToken.h"
+#include "WizToken.h"
 #include "WizToken_p.h"
 
 #include <QMutexLocker>
+#include <QRecursiveMutex>
 #include <QString>
 #include <QDebug>
 
@@ -14,7 +15,7 @@
 WizTokenPrivate::WizTokenPrivate(WizToken* token)
     : m_bProcessing(false)
     , m_bLastIsNetworkError(false)
-    , m_mutex(new QMutex(QMutex::Recursive))
+    , m_mutex(new QRecursiveMutex())
     , q(token)
 
 {

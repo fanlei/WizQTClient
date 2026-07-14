@@ -1,4 +1,4 @@
-﻿#include "WizDocumentWebView.h"
+#include "WizDocumentWebView.h"
 
 #include <QRunnable>
 #include <QList>
@@ -6,7 +6,8 @@
 #include <QUrl>
 #include <QDir>
 #include <QString>
-#include <QRegExp>
+#include <QLocale>
+#include "share/WizQtCompat.h"
 #include <QAction>
 #include <QPrinter>
 #include <QFileDialog>
@@ -2037,7 +2038,7 @@ void WizDocumentWebView::editorCommandExecuteInsertDate()
     WizAnalyzer& analyzer = WizAnalyzer::getAnalyzer();
     analyzer.logAction("insertDate");
     //
-    QString date = QDate::currentDate().toString(Qt::DefaultLocaleLongDate);
+    QString date = QLocale().toString(QDate::currentDate(), QLocale::LongFormat);
     editorCommandExecuteInsertHtml(date, false);
 }
 
@@ -2046,7 +2047,7 @@ void WizDocumentWebView::editorCommandExecuteInsertTime()
     WizAnalyzer& analyzer = WizAnalyzer::getAnalyzer();
     analyzer.logAction("insertTime");
     //
-    QString time = QTime::currentTime().toString(Qt::DefaultLocaleLongDate);
+    QString time = QLocale().toString(QTime::currentTime(), QLocale::LongFormat);
     editorCommandExecuteInsertHtml(time, false);
 }
 

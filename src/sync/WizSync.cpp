@@ -1,4 +1,4 @@
-﻿#include "WizSync.h"
+#include "WizSync.h"
 #include "WizKMSync_p.h"
 #include "WizKMSync.h"
 
@@ -1449,7 +1449,7 @@ bool WizUploadMessages(IWizKMSyncEvents* pEvents, WizKMAccountsServer& server, I
         qDebug() << "upload read message : " << strReadIds;
         if (server.setMessageReadStatus(strReadIds, 1))
         {
-            QStringList readIds = strReadIds.split(',', QString::SkipEmptyParts);
+            QStringList readIds = strReadIds.split(',', Qt::SkipEmptyParts);
             CWizMessageDataArray readMsgArray;
             for (it = arrayMessage.begin(); it != arrayMessage.end(); it++)
             {
@@ -1470,7 +1470,7 @@ bool WizUploadMessages(IWizKMSyncEvents* pEvents, WizKMAccountsServer& server, I
         qDebug() << "upload delete message : " << strReadIds;
         if (server.setMessageDeleteStatus(strDeleteIds, 1))
         {
-            QStringList deleteIds = strDeleteIds.split(',', QString::SkipEmptyParts);
+            QStringList deleteIds = strDeleteIds.split(',', Qt::SkipEmptyParts);
             CWizMessageDataArray deleteMsgArray;
             for (it = arrayMessage.begin(); it != arrayMessage.end(); it++)
             {

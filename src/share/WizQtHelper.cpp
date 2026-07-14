@@ -1,4 +1,4 @@
-﻿#include "WizQtHelper.h"
+#include "WizQtHelper.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -158,7 +158,7 @@ void CString::format(QString strFormat, ...)
     //
     va_list argList;
     va_start( argList, strFormat );
-    vsprintf(strFormat2.toUtf8(), argList);
+    *this = QString::vasprintf(strFormat2.toUtf8().constData(), argList);
     va_end( argList );
 }
 

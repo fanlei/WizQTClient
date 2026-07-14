@@ -1,4 +1,4 @@
-﻿#include <QtGlobal>
+#include <QtGlobal>
 #include <QApplication>
 #include <QTreeWidget>
 #include <QMessageBox>
@@ -6,12 +6,15 @@
 #include <QDir>
 #include <QPixmapCache>
 #include <QTranslator>
+#include <QLocale>
 #include <QProcess>
 #include <QSettings>
 #include <QDesktopServices>
 #include <QSslConfiguration>
 #include <QNetworkProxy>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QtWebEngine>
+#endif
 
 #include <sys/stat.h>
 
@@ -120,7 +123,9 @@ int mainCore(int argc, char *argv[])
         return 0;
     }
     //
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QtWebEngine::initialize();
+#endif
 #else
     QApplication a(argc, argv);
     //
@@ -236,7 +241,7 @@ int mainCore(int argc, char *argv[])
     //
     // setup locale for welcome dialog
     QString strLocale = userSettings.locale();
-    QLocale::setDefault(strLocale);
+    QLocale::setDefault(QLocale(strLocale));
 
     QTranslator translatorWizNote;
     QString strLocaleFile = Utils::WizPathResolve::localeFileName(strLocale);

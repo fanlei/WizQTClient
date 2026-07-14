@@ -1,6 +1,6 @@
-﻿#include "WizRtfReader.h"
+#include "WizRtfReader.h"
 #include <QFile>
-#include <QTextCodec>
+#include "WizQtCompat.h"
 #include <QDebug>
 //#include <QByteArrayData>
 

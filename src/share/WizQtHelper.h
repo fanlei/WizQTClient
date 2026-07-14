@@ -1,4 +1,4 @@
-﻿#ifndef WIZQTHELPER_H
+#ifndef WIZQTHELPER_H
 #define WIZQTHELPER_H
 
 #include <QtGlobal>
@@ -133,7 +133,7 @@ public:
     WizOleDateTime(const QDateTime& other) { *this = other; }
     WizOleDateTime(int year, int month, int day, int hour, int minute, int second) : QDateTime(QDate(year, month, day), QTime(hour, minute, second))  {}
     //
-    WizOleDateTime(time_t t) { this->setTime_t(t);}
+    WizOleDateTime(time_t t) { this->setSecsSinceEpoch(t);}
     //
     int getYear() const { return date().year(); }
     int getMonth() const { return date().month(); }

@@ -1,4 +1,4 @@
-﻿#ifndef WIZSERVICE_WIZAPIENTRY_H
+#ifndef WIZSERVICE_WIZAPIENTRY_H
 #define WIZSERVICE_WIZAPIENTRY_H
 
 #define WIZNOTE_API_SERVER      "https://api.wiz.cn/"
@@ -6,6 +6,7 @@
 #include <QString>
 #include <QMap>
 #include <QMutex>
+#include <QRecursiveMutex>
 
 class WizCommonApiEntry
 {
@@ -53,7 +54,7 @@ private:
     static QString getUrlFromCache(const QString& strCommand);
 
 private:
-    static QMutex m_mutex;
+    static QRecursiveMutex m_mutex;
     static QString m_server;
     static QMap<QString, QString> m_cacheMap;
 };

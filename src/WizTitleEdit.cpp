@@ -1,4 +1,4 @@
-﻿#include "WizTitleEdit.h"
+#include "WizTitleEdit.h"
 
 #include <QCompleter>
 #include <QAbstractItemView>
@@ -44,7 +44,7 @@ void WizTitleEdit::applyTheme()
 
 QSize WizTitleEdit::sizeHint() const
 {
-    return QSize(fontMetrics().width(text()), fontMetrics().height() + 10);
+    return QSize(fontMetrics().horizontalAdvance(text()), fontMetrics().height() + 10);
 }
 
 void WizTitleEdit::keyPressEvent(QKeyEvent* e)

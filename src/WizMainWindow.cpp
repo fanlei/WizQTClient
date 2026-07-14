@@ -1,4 +1,4 @@
-﻿#include "WizMainWindow.h"
+#include "WizMainWindow.h"
 
 #include <QToolBar>
 #include <QMenuBar>
@@ -2141,7 +2141,6 @@ QWidget* WizMainWindow::createNoteListView()
     m_noteListWidget->setMinimumWidth(100);
     QVBoxLayout* layoutList = new QVBoxLayout();
     layoutList->setContentsMargins(0, 0, 0, 0);
-    layoutList->setMargin(0);
     layoutList->setSpacing(0);
     m_noteListWidget->setLayout(layoutList);
     //
@@ -2162,7 +2161,6 @@ QWidget* WizMainWindow::createNoteListView()
     QHBoxLayout* layoutButtonContainer = new QHBoxLayout();
     layoutButtonContainer->setContentsMargins(0, 0, 0, 0);
     layoutButtonContainer->setSpacing(0);
-    layoutButtonContainer->setMargin(0);
     noteButtonsContainer->setLayout(layoutButtonContainer);
     if (isDarkMode()) {
         noteButtonsContainer->setStyleSheet("background-color:#333333");

@@ -260,6 +260,7 @@ set(wiznote_HEADERS
     share/jsoncpp/json/json.h
     share/jsoncpp/json/json-forwards.h
     share/WizRequest.h
+    share/WizQtCompat.h
 
     WizDef.h
     WizActions.h
@@ -470,8 +471,11 @@ if(UNIX)
     elseif(NOT APPLE)
         add_executable(WizNote ${wiznote_SOURCES} ${wiznote_HEADERS} ${wiznote_FORM_HEADERS} ${wiznote_QM} ${wiznote_RC})
         set_target_properties(${PROJECT_NAME} PROPERTIES AUTOMOC_MOC_OPTIONS "-DQ_OS_LINUX")
-        set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-static-libstdc++ -static-libgcc")
-        find_package(Qt5Svg)
+        if(QT_VERSION_MAJOR EQUAL 6)
+            find_package(Qt6 COMPONENTS Svg REQUIRED)
+        else()
+            find_package(Qt5Svg REQUIRED)
+        endif()
 
         install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
         install(DIRECTORY ${CMAKE_SOURCE_DIR}/share/ DESTINATION share/wiznote PATTERN ".DS_Store" EXCLUDE)
@@ -570,10 +574,11 @@ if(UNIX)
                         X11
 			quazip
 			cryptlib
-            Qt5::Svg
-            Qt5::WebEngine
-            Qt5::WebChannel
-			Qt5::WebEngineWidgets
+            ${QT_VERSION_PREFIX}::Svg
+            ${QT_WEBENGINE_LIB}
+            ${QT_VERSION_PREFIX}::WebChannel
+			${QT_VERSION_PREFIX}::WebEngineWidgets
+            ${QT_COMPAT_LIB}
 			${CMAKE_DL_LIBS}
 		)
 	endif(APPLE)
